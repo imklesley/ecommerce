@@ -9,6 +9,8 @@
     {#Cria-se uma linha #}
     <div class="row">
         {#Cria-se uma coluna com o tamanho de 12#}
+
+
         <div class="col-lg-12">
             {#Dentro dessa coluna cria-se duas "caixas" separadas por um br#}
             <div class="box-element">
@@ -46,21 +48,24 @@
                     <div style="flex: 1"><strong>Quantidade</strong></div>
                     <div style="flex: 1"><strong>Total</strong></div>
                 </div>
-                <div class="cart-row">
-                    <div style="flex: 2"><img class="row-image" src="{% static 'images/placeholder.png' %}" alt="">
-                    </div>
-                    <div style="flex: 2">Product 1</div>
-                    <div style="flex: 1">R$ 50,00</div>
-                    <div style="flex: 1">
-                        <p class="quantity">4</p>
-                        <div class="quantity">
-                            <img class="chg-quantity" src="{% static  'images/arrow-up.png' %}">
 
-                            <img class="chg-quantity" src="{% static  'images/arrow-down.png' %}">
+                {% for item in items %}
+                    <div class="cart-row">
+                        <div style="flex: 2"><img class="row-image" src="{{ item.product.image_url }}" alt="">
                         </div>
+                        <div style="flex: 2">{{ item.product.name }}</div>
+                        <div style="flex: 1">R$ {{ item.product.price }}</div>
+                        <div style="flex: 1">
+                            <p class="quantity">{{ item.product.quantity }}</p>
+                            <div class="quantity">
+                                <img class="chg-quantity" src="{% static  'images/arrow-up.png' %}">
+
+                                <img class="chg-quantity" src="{% static  'images/arrow-down.png' %}">
+                            </div>
+                        </div>
+                        <div style="flex: 1">R$ 200,00</div>
                     </div>
-                    <div style="flex: 1">R$ 200,00</div>
-                </div>
+                {% endfor %}
 
 
             </div>
