@@ -23,16 +23,31 @@ def cart(request):
         # Status recebe Order.STATUS[0][0] pois no models falei que o campo seria um choice, logo criei
         # um valor para representar o estado da ordem [0][0] é o primeiro valor da tupla
         # ('In the cart', 'In the cart')
-        orders, created = Order.objects.get_or_create(customer=customer, status=Order.STATUS[0][0])
-        items = orders.orderitem_set.all()
+        order, created = Order.objects.get_or_create(customer=customer, status=Order.STATUS[0][0])
+        items = order.orderitem_set.all()
+        context['order'] = order
+        context['items'] = items
 
-    else:
-        items = []
 
-    context['items'] = items
+
     return render(request=request, template_name='store/cart.html', context=context)
 
 
 def checkout(request):
     context = {}
+
+    if request.user.is_authenticated:
+        customer = request.user.customer
+        # Status recebe Order.STATUS[0][0] pois no models falei que o campo seria um choice, logo criei
+        # um valor para representar o estado da ordem [0][0] é o primeiro valor da tupla
+        # ('In the cart', 'In the cart')
+        order, created = Order.objects.get_or_create(customer=customer, status=Order.STATUS[0][0])
+        items = order.orderitem_set.all()
+        context['order'] = order
+        context['items'] = items
+
+    else:
+        return HttpResponse('You is not authorized!!')
+
+
     return render(request=request, template_name='store/checkout.html', context=context)
