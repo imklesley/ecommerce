@@ -1,14 +1,16 @@
-let btnUpdateCart = document.getElementsByClassName('update-cart')
+var btnUpdateCart = document.getElementsByClassName('update-cart')
 
-for (let i = 0; i <= btnUpdateCart.length; i++) {
+for (var i = 0; i <= btnUpdateCart.length; i++) {
     btnUpdateCart[i].addEventListener('click', function () {
-        let productId = this.dataset.product;
-        let action = this.dataset.action;
+
+        var productId = this.dataset.product;
+        var action = this.dataset.action;
 
         if (user === 'AnonymousUser') {
             console.log('User not logged in!')
         } else {
 
+            console.log(productId, action)
             updateUserOrder(productId, action)
 
         }
@@ -18,6 +20,31 @@ for (let i = 0; i <= btnUpdateCart.length; i++) {
 
 
 function updateUserOrder(productId, action) {
-    console.log('The user ', user, 'clicked in the product with id:', productId, ' and the action is: ', action)
+    console.log('The user ', user, 'clicked in the product with id:', productId, ' and the action is: ', action, 'Sending data')
+
+    var url = '/update_item/'
+
+    //Para enviar o nosso post data
+    fetch(url, {
+        method: 'post',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrftoken
+        },
+        body: JSON.stringify({'productId': productId, 'action': action})
+    })
+
+        .then(function (response) {
+            return response.json()
+        })
+
+        .then((data) => {
+            console.log('response from backend: ', data)
+            location.reload()
+        }).catch(function (error) {
+        console.error(error)
+    })
+
+
 }
 

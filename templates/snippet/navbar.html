@@ -13,12 +13,16 @@
       </li>
     </ul>
     <div class="form-inline my-2 my-lg-0 end">
-     	<a href="#"class="btn btn-warning" style="border-radius: 5px">Login</a>
+     	{% if request.user.is_authenticated %}
+            <h5 style="color: white">Olá, {{ request.user.customer.name }}. <a style="color: red;" href=""> Sair</a></h5>
+     	{% else %}
+            <a href="#" class="btn btn-warning" style="border-radius: 5px">Login</a>
+     	{% endif %}
 
      	<a href="{% url 'cart' %}">
     		<img  id="cart-icon" src="{% static 'images/cart.png' %}">
     	</a>
-    	<p id="cart-total">0</p>
+    	<p id="cart-total">{{ order.get_total_cart_items }}</p>
 
     </div>
   </div>
