@@ -8,7 +8,8 @@ for (var i = 0; i <= btnUpdateCart.length; i++) {
 
         if (user === 'AnonymousUser') {
             console.log('User not logged in!!!  ');
-            errorAddCart.classList.remove('hidden');
+            document.getElementById('error-add-cart').classList.remove('hidden');
+
 
         } else {
 

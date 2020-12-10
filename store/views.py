@@ -1,11 +1,14 @@
-from django.shortcuts import render
+from django.shortcuts import render,redirect
 from .models import *
 from django.http import HttpResponse, JsonResponse
+from django.contrib.auth import logout
+
 
 import json
 
-
-# Create your views here.
+def log_out(request):
+    logout(request)
+    return redirect('store')
 
 
 def store(request):
@@ -36,9 +39,13 @@ def cart(request):
         # ('In the cart', 'In the cart')
         order, created = Order.objects.get_or_create(customer=customer, status=Order.STATUS[0][0])
         items = order.orderitem_set.all()
-        context['order'] = order
-        context['items'] = items
 
+    else:
+        order = {'get_total_order': 0, 'get_total_cart_items': 0}
+        items = []
+
+    context['order'] = order
+    context['items'] = items
     return render(request=request, template_name='store/cart.html', context=context)
 
 
@@ -54,6 +61,7 @@ def checkout(request):
         items = order.orderitem_set.all()
         context['order'] = order
         context['items'] = items
+
 
     else:
         return HttpResponse('You is not authorized!!')
@@ -85,3 +93,10 @@ def update_item(request):
         order_item.delete()
 
     return JsonResponse(f'Item was {action}ed', safe=False)
+
+
+
+def process_order(request):
+    data = json.loads(request.body)
+    print(data)
+    return JsonResponse('Payment Completed', safe=False)

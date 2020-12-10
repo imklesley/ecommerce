@@ -12,58 +12,87 @@
                     {% csrf_token %}
 
 
-                    <div id="user-info">
+                    {% if  not request.user.is_authenticated %}
+                        <div id="user-info">
+                            <div class="form-field">
+                                <input required type="text" name="name" placeholder="Nome ..." class="form-control">
+                            </div>
 
-                        <div class="form-field">
-                            <input required type="text" name="name" placeholder="Nome ..." class="form-control">
-                        </div>
-
-                        <div class="form-field">
-                            <input required type="email" name="email" placeholder="E-mail ..." class="form-control">
-                        </div>
-                    </div>
-
-
-                    <div id="shipping-info">
-                        <hr>
-                        <p>Informações de Envio</p>
-                        <hr>
-                        <div class="form-field">
-                            <input label="Endereço" required type="text" name="adress"
-                                   placeholder="Endereço ..." class="form-control">
+                            <div class="form-field">
+                                <input required type="email" name="email" placeholder="E-mail ..." class="form-control">
+                            </div>
                         </div>
 
 
-                        <div class="form-field"><input required type="text" name="city"
-                                                       placeholder="Cidade ..." class="form-control">
+                    {% endif %}
+
+
+                    {% if order.shipping %}
+                        <div id="shipping-info">
+                            <hr>
+                            <h3>Informações de Envio</h3>
+                            <hr>
+                            <div class="form-field">
+                                <input label="Endereço" required type="text" name="adress"
+                                       placeholder="Endereço ..." class="form-control">
+                            </div>
+
+
+                            <div class="form-field"><input required type="text" name="city"
+                                                           placeholder="Cidade ..." class="form-control">
+                            </div>
+
+                            <div class="form-field"><input required type="text" name="state"
+                                                           placeholder="Estado ..." class="form-control">
+                            </div>
+
+                            <div class="form-field"><input required type="text" name="zipcode"
+                                                           placeholder="CEP ..." class="form-control">
+                            </div>
+
+                            <div class="form-field"><input required type="text" name="country"
+                                                           placeholder="País ..." class="form-control">
+                            </div>
+
+
                         </div>
 
-                        <div class="form-field"><input required type="text" name="state"
-                                                       placeholder="Estado ..." class="form-control">
-                        </div>
-
-                        <div class="form-field"><input required type="text" name="zipcode"
-                                                       placeholder="CEP ..." class="form-control">
-                        </div>
-
-                        <div class="form-field"><input required type="text" name="country"
-                                                       placeholder="País ..." class="form-control">
-                        </div>
-
-
-                    </div>
+                    {% endif %}
 
                     <hr>
-                    {#"btn-block" faz com que o button ocupe todo os espaço#}
-                    <input type="submit" class="btn btn-success btn-block" value="Continue">
+                    {#"btn-block" faz com que o button ocupe all space#}
+                    <input id="form-button" type="submit" class="btn btn-success btn-block" value="Continue">
 
 
                 </form>
             </div>
 
             <br>
-            <div class="box-element hidden" id="payment-info">
-                <small>Opções de Pagamento</small>
+            {#            colocar hidden nessa class#}
+            <div class="box-element" id="payment-info">
+                <a href="#" class="btn btn-outline-dark btn-block" id="edit-form" style="border-radius: 5px">&#8592
+                    Editar Informações de Envio</a>
+                <hr>
+                <h3 style="align-content: center">Opções de Pagamento</h3>
+                <hr>
+                {#                Para whatsapp#}
+                <a id="make-whatsapp-order"
+                   href="https://api.whatsapp.com/send/?phone=5563999500153&text={{ order.whatsapp_order_text }}"
+                   class="btn btn-outline-success btn-block" style="float: right; border-radius: 5px" type="button">Fazer
+                    Pedido <img style="padding-left: 10px"
+                                src="https://www.flaticon.com/svg/static/icons/svg/2111/2111728.svg" alt="" height="23"></a>
+                {#                Outro tipo de finalização de pedido#}
+                <button id="make-payment" class="btn btn-outline-dark btn-block"
+                        style="float: right; border-radius: 5px"
+                        type="button">Finalizar
+                    Pedido
+                </button>
+                <br>
+                <br>
+                <br>
+                <br>
+
+
             </div>
 
 
@@ -76,12 +105,7 @@
                 <h3>Resumo do Pedido</h3>
                 <br>
                 <hr>
-                <div class="cart-row">
-                    <div style="flex: 2"></div>
-                    <div style="flex: 2"><strong>Item</strong></div>
-                    <div style="flex: 1"><strong>Preço</strong></div>
-                    <div style="flex: 1"><strong>Quantidade</strong></div>
-                </div>
+
                 {% for item in items %}
                     <div class="cart-row">
                         <div style="flex: 2"><img class="row-image" src="{{ item.product.image_url }}" alt=""></div>
@@ -98,4 +122,116 @@
 
         </div>
     </div>
+
+
+
+    <script type="text/javascript">
+        var form = document.getElementById('form')
+        form.addEventListener('submit', function (event) {
+
+            event.preventDefault()
+            console.log('Form Submmited!')
+            document.getElementById('form-button').classList.add('hidden')
+            document.getElementById('payment-info').classList.remove('hidden')
+
+            //Para não permitir editar os campos depois que avançou para "Opçãoes de Pagamentos"
+            var fields = document.getElementsByClassName('form-control')
+            for (let i = 0; fields.length; i++) {
+                fields[i].disabled = true;
+            }
+        })
+
+
+        var editForm = document.getElementById('edit-form')
+
+        editForm.addEventListener('click', function (event) {
+            event.preventDefault()
+
+
+            document.getElementById('form-button').classList.remove('hidden')
+            document.getElementById('payment-info').classList.add('hidden')
+
+
+            //Para não permitir editar os campos depois que avançou para "Opçãoes de Pagamentos"
+            var fields = document.getElementsByClassName('form-control')
+            for (let i = 0; fields.length; i++) {
+                fields[i].disabled = false;
+            }
+
+        })
+
+
+        document.getElementById('make-payment').addEventListener('click', function (event) {
+
+            submitFormData()
+
+
+        })
+
+
+        function submitFormData() {
+            var total =
+            {{ order.get_total_order }}
+
+            var userFormData = {
+                'name': null,
+                'email': null,
+                'total': total,
+            };
+
+            var shippingFormData = {
+                'address': null,
+                'city': null,
+                'state': null,
+                'zipcode': null,
+                'country': null,
+            };
+
+            var shipping = '{{ order.shipping }}';
+            if (shipping != 'False') {
+                shippingFormData.address = form.adress.value
+                shippingFormData.city = form.city.value
+                shippingFormData.state = form.state.value
+                shippingFormData.zipcode = form.zipcode.value
+                shippingFormData.country = form.country.value
+            }
+
+            if (user == 'AnonymousUser') {
+                userFormData.name = form.name.value
+                userFormData.email = form.email.value
+            }
+
+            console.log(userFormData)
+
+            console.log(shippingFormData)
+
+            //Agora fazer o fecht api para enviar dados pro backend
+            var url = '/process_order/'
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrftoken
+                }, body: JSON.stringify({'userData': userFormData, 'shippingData': shippingFormData})
+
+
+            }).then(function (response) {
+                return response.json();
+            }).then(function (data) {
+                console.log(data);
+                alert('Compra realizada com sucesso!');
+                window.location.href = '{% url 'store'%}';
+
+            }).catch(function (error) {
+                console.error(error);
+            })
+        }
+
+    </script>
+
+
 {% endblock %}
+
+
+
+

@@ -46,6 +46,29 @@
 <body>
 {% include 'snippet/navbar.html' %}
 
+{#Gambiarra linhas 50-68#}
+<div id="error-add-cart" style="padding-left: 40%" class="alert alert-danger alert-dismissible fade show   hidden   "
+     role="alert">
+    <strong>Hey Deusa!</strong> Faz o <a style="color: darkred" href="/login"><strong>LOGIN</strong></a> para conseguir
+    adicionar ao carrinho.
+    <button id="error-add-cart-close" type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+
+
+<script>
+    {#    Essa variável é alterada em cart.js#}
+    var errorAddCart = document.getElementById('error-add-cart')
+    var btnClose = document.getElementById('error-add-cart-close');
+    btnClose.addEventListener('click', function () {
+        console.log('Escondi')
+        btnClose.classList.add('hidden')
+        location.reload()
+    })
+</script>
+
+
 <div class="container main">
     {% block content %}
     {% endblock %}
