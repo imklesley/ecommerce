@@ -6,12 +6,39 @@
 
 {% block content %}
     <div class="row">
+
+        <div class="col-lg-6">
+            <div class="box-element">
+                <a class="btn btn-outline-dark btn-block" style="border-radius: 5px" href="{% url 'cart' %}">&#8592
+                    Voltar para a sacola</a>
+                <hr>
+                <h3>Resumo do Pedido</h3>
+                <br>
+                <hr>
+
+                {% for item in items %}
+                    <div class="cart-row">
+                        <div style="flex: 2"><img class="row-image" src="{{ item.product.image_url }}" alt=""></div>
+                        <div style="flex: 2">{{ item.product.name }}</div>
+                        <div style="flex: 1">R$ {{ item.product.price }}</div>
+                        <div style="flex: 1"><p class="quantity">{{ item.quantity }}</p></div>
+                    </div>
+                {% endfor %}
+
+                <h5>Itens: {{ order.get_total_cart_items }}</h5>
+                <h5>Total: R$ {{ order.get_total_order }}</h5>
+            </div>
+
+
+        </div>
+
+
         <div class="col-lg-6">
             <div class="box-element" id="form-wrapper">
                 <form id="form">
                     {% csrf_token %}
 
-
+                    {#                    Caso o usuário não esteja logado, permitir que ele faça o pedido pelo whatsapp#}
                     {% if  not request.user.is_authenticated %}
                         <div id="user-info">
                             <div class="form-field">
@@ -22,9 +49,34 @@
                                 <input required type="email" name="email" placeholder="E-mail ..." class="form-control">
                             </div>
                         </div>
+                    {% else %}
+                        {% for name in request.user.customer.name.split|slice:1 %}
+                            <p id="msg-add-other-receiver" class=""><strong>{{ name }}</strong>, outra pessoa que vai
+                                receber? <a id="add-other-receiver"
+                                            style="color: goldenrod"
+                                            href="#">Clique aqui</a>
+                            </p>
+                        {% endfor %}
+                        <div id="other-receiver-info" class="hidden">
+                            <h5>Quem vai receber esse produto?</h5>
 
+                            <div class="form-field">
+                                <input required type="text" name="name" placeholder="Nome ..." class="form-control">
+                            </div>
 
+                            <div class="form-field">
+                                <input required type="email" name="email" placeholder="E-mail ..." class="form-control">
+                            </div>
+                        </div>
                     {% endif %}
+
+
+
+
+
+
+
+
 
 
                     {% if order.shipping %}
@@ -62,8 +114,6 @@
                     <hr>
                     {#"btn-block" faz com que o button ocupe all space#}
                     <input id="form-button" type="submit" class="btn btn-success btn-block" value="Continue">
-
-
                 </form>
             </div>
 
@@ -97,35 +147,24 @@
 
 
         </div>
-        <div class="col-lg-6">
-            <div class="box-element">
-                <a class="btn btn-outline-dark btn-block" style="border-radius: 5px" href="{% url 'cart' %}">&#8592
-                    Voltar para a sacola</a>
-                <hr>
-                <h3>Resumo do Pedido</h3>
-                <br>
-                <hr>
 
-                {% for item in items %}
-                    <div class="cart-row">
-                        <div style="flex: 2"><img class="row-image" src="{{ item.product.image_url }}" alt=""></div>
-                        <div style="flex: 2">{{ item.product.name }}</div>
-                        <div style="flex: 1">R$ {{ item.product.price }}</div>
-                        <div style="flex: 1"><p class="quantity">{{ item.quantity }}</p></div>
-                    </div>
-                {% endfor %}
-
-                <h5>Itens: {{ order.get_total_cart_items }}</h5>
-                <h5>Total: R$ {{ order.get_total_order }}</h5>
-            </div>
-
-
-        </div>
     </div>
 
 
 
     <script type="text/javascript">
+
+
+        var otherReceiverInfo = document.getElementById('other-receiver-info');
+        var msgotherReceiverInfo = document.getElementById('msg-add-other-receiver');
+        document.getElementById('add-other-receiver').addEventListener('click', function () {
+            msgotherReceiverInfo.classList.add('hidden');
+            otherReceiverInfo.classList.remove('hidden')
+
+
+        })
+
+
         var form = document.getElementById('form')
         form.addEventListener('submit', function (event) {
 
@@ -176,6 +215,7 @@
             var userFormData = {
                 'name': null,
                 'email': null,
+                'otherUser':false,
                 'total': total,
             };
 
@@ -196,9 +236,18 @@
                 shippingFormData.country = form.country.value
             }
 
+
+
             if (user == 'AnonymousUser') {
                 userFormData.name = form.name.value
                 userFormData.email = form.email.value
+            }
+            else if(msgotherReceiverInfo.classList.contains('hidden')){
+                userFormData.name = form.name.value
+                userFormData.email = form.email.value
+                userFormData.otherUser = true
+
+
             }
 
             console.log(userFormData)

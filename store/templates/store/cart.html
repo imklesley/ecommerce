@@ -7,100 +7,85 @@
 {% block content %}
 
 
-    {% if request.user.is_authenticated %}
-        {#Cria-se uma linha #}
-        <div class="row">
-            {#Cria-se uma coluna com o tamanho de 12#}
+    {#Cria-se uma linha #}
+    <div class="row">
+        {#Cria-se uma coluna com o tamanho de 12#}
 
 
-            <div class="col-lg-12">
-                {#Dentro dessa coluna cria-se duas "caixas" separadas por um br#}
-                <div class="box-element">
-                    <a href="{% url 'store' %}" class="btn btn-outline-dark btn-block" style="border-radius: 5px">&#x2190;
-                        Continuar
-                        Comprando</a>
-                    <br>
-                    <br>
-                    <table class="table">
-                        <tr>
-                            <th>
-                                <h5>Itens: <strong>{{ order.get_total_cart_items }}</strong></h5>
-                            </th>
-                            <th>
-                                <h5>Total: <strong>R$ {{ order.get_total_order }}</strong></h5>
-                            </th>
-
-                            <th>
-                                <a href="{% url 'checkout' %}" class="btn btn-success"
-                                   style="border-radius: 5px;float: right;margin:5px">Finalizar Compra</a>
-                            </th>
-
-                        </tr>
-
-
-                    </table>
-
-                </div>
+        <div class="col-lg-12">
+            {#Dentro dessa coluna cria-se duas "caixas" separadas por um br#}
+            <div class="box-element">
+                <a href="{% url 'store' %}" class="btn btn-outline-dark btn-block" style="border-radius: 5px">&#x2190;
+                    Continuar
+                    Comprando</a>
                 <br>
-                <div class="box-element">
+                <br>
+                <table class="table">
+                    <tr>
+                        <th>
+                            <h5>Itens: <strong>{{ order.get_total_cart_items }}</strong></h5>
+                        </th>
+                        <th>
+                            <h5>Total: <strong>R$ {{ order.get_total_order }}</strong></h5>
+                        </th>
 
+                        <th>
+                            <a href="{% url 'checkout' %}" class="btn btn-success"
+                               style="border-radius: 5px;float: right;margin:5px">Finalizar Compra</a>
+                        </th>
+
+                    </tr>
+
+
+                </table>
+
+            </div>
+            <br>
+            <div class="box-element">
+
+                <div class="cart-row">
+                    <div style="flex: 2"></div>
+                    <div style="flex: 2"><strong>Item</strong></div>
+                    <div style="flex: 1"><strong>Preço</strong></div>
+                    <div style="flex: 1"><strong>Quantidade</strong></div>
+                    <div style="flex: 1"><strong>Total</strong></div>
+                </div>
+
+                {% for item in items %}
                     <div class="cart-row">
-                        <div style="flex: 2"></div>
-                        <div style="flex: 2"><strong>Item</strong></div>
-                        <div style="flex: 1"><strong>Preço</strong></div>
-                        <div style="flex: 1"><strong>Quantidade</strong></div>
-                        <div style="flex: 1"><strong>Total</strong></div>
-                    </div>
-
-                    {% for item in items %}
-                        <div class="cart-row">
-                            <div style="flex: 2"><img class="row-image" src="{{ item.product.image_url }}" alt="">
-                            </div>
-                            <div style="flex: 2">{{ item.product.name }}</div>
-                            <div style="flex: 1">R$ {{ item.product.price }}</div>
-                            <div style="flex: 1">
-                                <p class="quantity">{{ item.quantity }}</p>
-                                <div class="quantity">
-                                    <img class="chg-quantity update-cart" data-product="{{ item.product.id }}" data-action="add"
-                                         src="{% static  'images/arrow-up.png' %}">
-
-                                    <img class="chg-quantity update-cart" data-product="{{ item.product.id }}"
-                                         data-action="subtract" src="{% static  'images/arrow-down.png' %}">
-                                </div>
-                            </div>
-                            <div style="flex: 1">R$ {{ item.get_total_order_item }}</div>
+                        <div style="flex: 2"><img class="row-image" src="{{ item.product.image_url }}" alt="">
                         </div>
-                    {% endfor %}
+                        <div style="flex: 2">{{ item.product.name }}</div>
+                        <div style="flex: 1">R$ {{ item.product.price }}</div>
+                        <div style="flex: 1">
+                            <p class="quantity">{{ item.quantity }}</p>
+                            <div class="quantity">
+                                <img class="chg-quantity update-cart" data-product="{{ item.product.id }}"
+                                     data-action="add"
+                                     src="{% static  'images/arrow-up.png' %}">
 
-                    {% if items.count > 0 %}
-                        <a class="btn btn-outline-danger update-cart" data-action="clear_cart" data-product="all"
-                           style="border-radius: 5px;float: right;margin:5px">Limpar Carinho</a>
-                    {% endif %}
+                                <img class="chg-quantity update-cart" data-product="{{ item.product.id }}"
+                                     data-action="subtract" src="{% static  'images/arrow-down.png' %}">
+                            </div>
+                        </div>
+                        <div style="flex: 1">R$ {{ item.get_total_order_item }}</div>
+                    </div>
+                {% endfor %}
+
+                {% if items.count > 0 %}
+                    <a class="btn btn-outline-danger update-cart" data-action="clear_cart" data-product="all"
+                       style="border-radius: 5px;float: right;margin:5px">Limpar Carinho</a>
+                {% endif %}
 
 
-                    <br>
-                    <br>
-
-
-                </div>
-            </div>
-        </div>
-    {% else %}
-        <div class="row">
-            <div class="col-lg-12">
                 <br>
                 <br>
-                <div class="box-element" style="">
-                    <br>
-                    <br>
-                    <h3>You need to <a style="color: goldenrod;" href="{% url 'store' %}">Login</a>
-                        to see your cart !!</h3>
-                    <br>
-                    <br>
-                </div>
+
+
             </div>
         </div>
-    {% endif %}
+    </div>
+
 
 
 

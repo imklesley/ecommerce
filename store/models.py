@@ -60,7 +60,7 @@ class Order(models.Model):
         orders_items = self.orderitem_set.all()
         # Faço um loop e somo todos valores de cada item
         total_order = sum(item.get_total_order_item for item in orders_items)
-        return total_order
+        return float(total_order)
 
     @property
     def get_total_cart_items(self):
@@ -123,7 +123,6 @@ class ShippingAdress(models.Model):
     city = models.CharField(max_length=100, null=False)
     country = models.CharField(max_length=100, null=False)
     zipcode = models.CharField(max_length=100, null=False)
-    a = models.DateTimeField(auto_now_add=True)
     date_added = models.DateTimeField(auto_now_add=True, null=False)
 
     def __str__(self):
