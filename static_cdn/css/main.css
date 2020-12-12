@@ -44,7 +44,7 @@ h1, h2, h3, h4, h5, h6 {
 
 /*Muda o fundo do navbar do bootstrapp o !important é pra garantir esse override    */
 .bg-dark {
-    background-color: #000 !important;
+    background-color: #0C1248 !important;
 }
 
 #cart-icon {
@@ -53,11 +53,14 @@ h1, h2, h3, h4, h5, h6 {
     margin-left: 15px;
 }
 
+
+
+
 #cart-total {
     display: block;
     text-align: center;
     color: #fff;
-    background-color: red;
+    background-color: #F45E39;
     width: 25px;
     height: 25px;
     border-radius: 50%;

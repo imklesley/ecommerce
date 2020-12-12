@@ -95,6 +95,7 @@ class Order(models.Model):
 
         text += break_line
         text += '-----------------------------' + break_line
+
         #Mostra os quantitativos
         text += f'*Quantidade de Itens:* {self.get_total_cart_items}{break_line}'
         text += f'*Total:* {self.get_total_order}{break_line}'

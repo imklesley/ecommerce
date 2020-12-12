@@ -127,8 +127,6 @@ def process_order(request):
         total = float(user_data['total'])
 
         if total == order.get_total_order:
-            print('aqui2')
-
             order.status = Order.STATUS[2][0]
             for item in order_item:
                 print(item)

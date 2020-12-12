@@ -16,7 +16,7 @@
      	{% if request.user.is_authenticated %}
             <h5 style="color: white">Olá, {{ request.user.customer.name }}. <a style="color: red;" href="{% url 'logout' %}"> Sair</a></h5>
      	{% else %}
-            <a href="#" class="btn btn-warning" style="border-radius: 5px">Login</a>
+            <a href="#"  class="btn btn-warning" style="color: white;border-radius: 5px;background-color: #F45E39;border-color: #F45E39;"><strong>Login</strong></a>
      	{% endif %}
 
      	<a href="{% url 'cart' %}">
