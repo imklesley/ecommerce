@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from .models import *
 from django.http import HttpResponse, JsonResponse
 from django.contrib.auth import logout
@@ -8,8 +8,7 @@ import json
 from datetime import datetime
 
 # class-based view
-from django.views import View
-from django.views.generic import ListView
+from django.views.generic import ListView,DetailView
 
 
 def log_out(request):
@@ -27,54 +26,125 @@ class StoreView(ListView):
 
 
     #Para realizar paginação basta fazer isso.COISA MAIS LINDA QUE JÁ Ví kkk
-    paginate_by = 2
+    paginate_by = 8
 
 
     def get_context_data(self, **kwargs):
         context = super(StoreView, self).get_context_data(**kwargs)
         data = cartData(self.request)
         order = data['order']
-        print(order)
+        # print(order)
         context['order'] = order
         return context
 
 
-def store(request):
-    context = {}
-
-    data = cartData(request)
-
-    products = Product.objects.all()
-
-    order = data['order']
-
-    context['products'] = products
-
-    context['order'] = order
-
-    return render(request=request, template_name='store/store.html', context=context)
 
 
-def cart(request):
-    context = {}
+class ProductDetailsView(DetailView):
+    model = Product
+    context_object_name = 'product'
+    template_name = 'store/product_details.html'
+    queryset = Product.objects.all()
 
-    data = cartData(request)
-
-    context['order'] = data['order']
-    context['items'] = data['items']
-    context['quantity_items'] = data['quantity_items']
-    return render(request=request, template_name='store/cart.html', context=context)
+    def get_queryset(self):
+        return self.queryset.filter(pk=self.kwargs.get('pk'))
 
 
-def checkout(request):
-    context = {}
-    data = cartData(request)
-    if data['quantity_items'] == 0:
-        return HttpResponse("You are not authorized to access this page!")
 
-    context['order'] = data['order']
-    context['items'] = data['items']
-    return render(request=request, template_name='store/checkout.html', context=context)
+
+
+
+
+    def get_context_data(self, **kwargs):
+        context = super(ProductDetailsView, self).get_context_data(**kwargs)
+        data = cartData(self.request)
+        order = data['order']
+        context['order'] = order
+        return context
+
+
+
+
+
+
+
+class CartView(ListView):
+    # Dados que seão exibidos
+    model = Product
+    # nome desse model chamado no html, caso não coloque será object_list
+    context_object_name = 'products'
+    # É preciso sobrescrever o template
+    template_name = 'store/cart.html'
+
+
+    def get_context_data(self, **kwargs):
+        context = super(CartView, self).get_context_data(**kwargs)
+        data = cartData(self.request)
+        order = data['order']
+        # print(order)
+        context['order'] = order
+        context['quantity_items'] = data['quantity_items']
+        context['items'] = data['items']
+        return context
+
+
+
+class CheckoutView(ListView):
+    # Dados que seão exibidos
+    model = Product
+    # nome desse model chamado no html, caso não coloque será object_list
+    context_object_name = 'products'
+    # É preciso sobrescrever o template
+    template_name = 'store/checkout.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(CheckoutView, self).get_context_data(**kwargs)
+        data = cartData(self.request)
+        order = data['order']
+        # print(order)
+        context['order'] = order
+        context['quantity_items'] = data['quantity_items']
+        context['items'] = data['items']
+        return context
+
+#
+# def store(request):
+#     context = {}
+#
+#     data = cartData(request)
+#
+#     products = Product.objects.all()
+#
+#     order = data['order']
+#
+#     context['products'] = products
+#
+#     context['order'] = order
+#
+#     return render(request=request, template_name='store/store.html', context=context)
+#
+#
+# def cart(request):
+#     context = {}
+#
+#     data = cartData(request)
+#
+#     context['order'] = data['order']
+#     context['items'] = data['items']
+#     context['quantity_items'] = data['quantity_items']
+#     return render(request=request, template_name='store/cart.html', context=context)
+#
+#
+# def checkout(request):
+#     context = {}
+#     data = cartData(request)
+#     if data['quantity_items'] == 0:
+#         return HttpResponse("You are not authorized to access this page!")
+#
+#     context['order'] = data['order']
+#     context['items'] = data['items']
+#     return render(request=request, template_name='store/checkout.html', context=context)
+
 
 
 def update_item(request):

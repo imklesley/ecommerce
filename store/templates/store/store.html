@@ -21,7 +21,7 @@
                     <button class="btn btn-outline-warning add-btn update-cart" data-product="{{ product.id }}"
                             data-action="add" style="border-radius: 5px;margin:0 0.3em ">
                         <b>Comprar</b></button>
-                    <a class="btn btn-outline-success" style="border-radius: 5px" href="#">View</a>
+                    <a class="btn btn-outline-success" style="border-radius: 5px" href="{% url 'product_details' product.id %}">Vizualizar</a>
                 </div>
                 <br>
             </div>
@@ -29,22 +29,8 @@
 
     </div>
 
-
-    {% include 'store/snippet/pagination.html' %}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    {% if page_obj.has_other_pages%}
+        {% include 'store/snippet/pagination.html' %}
+    {% endif %}
 
 {% endblock %}
