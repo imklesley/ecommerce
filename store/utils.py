@@ -53,7 +53,6 @@ def cartData(request) -> dict:
         quantity_items = items.count()
         return {'order': order, 'items': items, 'quantity_items': quantity_items}
     else:
-
         return cookieCart(request)
 
 

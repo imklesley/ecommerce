@@ -7,10 +7,36 @@ from .utils import *
 import json
 from datetime import datetime
 
+# class-based view
+from django.views import View
+from django.views.generic import ListView
+
 
 def log_out(request):
     logout(request)
     return redirect('store')
+
+
+class StoreView(ListView):
+    # Dados que seão exibidos
+    model = Product
+    # nome desse model chamado no html, caso não coloque será object_list
+    context_object_name = 'products'
+    # É preciso sobrescrever o template
+    template_name = 'store/store.html'
+
+
+    #Para realizar paginação basta fazer isso.COISA MAIS LINDA QUE JÁ Ví kkk
+    paginate_by = 2
+
+
+    def get_context_data(self, **kwargs):
+        context = super(StoreView, self).get_context_data(**kwargs)
+        data = cartData(self.request)
+        order = data['order']
+        print(order)
+        context['order'] = order
+        return context
 
 
 def store(request):
@@ -79,8 +105,6 @@ def update_item(request):
 
 def process_whatsapp_order(request):
     return JsonResponse('Whats Message Ready To Send', safe=False)
-
-
 
 
 #    {#LEMBRE QUE A OPÇÃO PAY WITH DEBIT OR CREDIT CARD SÓ IRÁ APARECER SE O SITE EM PRODUÇÃO POSSUIR certificado ssl#}
