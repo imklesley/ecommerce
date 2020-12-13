@@ -10,7 +10,7 @@
     <div class="row" style="    padding: 2em 0 ; ">
 
         {% for product in products %}
-            <div class="col-lg-4">
+            <div class="col-lg-3">
                 <img class="thumbnail" src=" {{ product.image_url }}" alt="{{ product.name }}">
                 <div class="box-element product">
                     <h6><strong>{{ product.name }}</strong></h6>
@@ -22,8 +22,8 @@
                             data-action="add" style="border-radius: 5px;margin:0 0.3em ">
                         <b>Comprar</b></button>
                     <a class="btn btn-outline-success" style="border-radius: 5px" href="#">View</a>
-
                 </div>
+                <br>
             </div>
         {% endfor %}
 

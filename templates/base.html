@@ -38,6 +38,36 @@
 
         const csrftoken = getToken('csrftoken');
 
+        {#Serve para pegar o cookie dos produtos no carrinho de um usuário não logado#}
+        function getCookie(name) {
+            //Divide a streing cookie e pega todos individualmente name=value pares e coloca num array
+		    var cookieArr = document.cookie.split(";");
+
+		    // Verifica todos os elementos do array
+		    for(var i = 0; i < cookieArr.length; i++) {
+		        var cookiePair = cookieArr[i].split("=");
+
+                /*Remove-se os possíveis espaços em branco do name do cookie desejado com os da lista criada*/
+		        if(name == cookiePair[0].trim()) {
+                    //Decodifica o valor do cookie e retorna
+		            return decodeURIComponent(cookiePair[1]);
+		        }
+		    }
+
+		    // Return null if not found
+		    return null;
+		}
+
+
+		var cart = JSON.parse(getCookie('cart'))
+
+		if (cart == undefined){
+			cart = {}
+			console.log('Cart Created!', cart)
+			document.cookie ='cart=' + JSON.stringify(cart) + ";domain=;path=/"
+		}
+		console.log('Cart:', cart)
+
 
     </script>
 

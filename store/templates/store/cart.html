@@ -20,7 +20,8 @@
                     Comprando</a>
                 <br>
                 <br>
-                <table class="table">
+                {% if quantity_items > 0 %}
+                    <table class="table">
                     <tr>
                         <th>
                             <h5>Itens: <strong>{{ order.get_total_cart_items }}</strong></h5>
@@ -38,6 +39,7 @@
 
 
                 </table>
+                {% endif %}
 
             </div>
             <br>
@@ -72,7 +74,7 @@
                     </div>
                 {% endfor %}
 
-                {% if items.count > 0 %}
+                {% if quantity_items > 0 %}
                     <a class="btn btn-outline-danger update-cart" data-action="clear_cart" data-product="all"
                        style="border-radius: 5px;float: right;margin:5px">Limpar Carinho</a>
                 {% endif %}

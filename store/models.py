@@ -4,10 +4,10 @@ from django.conf import settings
 
 
 class Customer(models.Model):
-    user = models.OneToOneField(User, null=False, blank=False, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, null=True, blank=True, on_delete=models.CASCADE)
     profile_img = models.ImageField(null=True, blank=True)
     name = models.CharField(max_length=300, null=False, blank=False)
-    email = models.EmailField(max_length=300)
+    email = models.EmailField(max_length=300, unique=True)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True, null=False, blank=False)
 

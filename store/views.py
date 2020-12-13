@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from .models import *
 from django.http import HttpResponse, JsonResponse
 from django.contrib.auth import logout
+from .utils import *
 
 import json
 from datetime import datetime
@@ -14,14 +15,11 @@ def log_out(request):
 
 def store(request):
     context = {}
+    data = cartData(request)
+
     products = Product.objects.all()
 
-    if request.user.is_authenticated:
-        customer = request.user.customer
-        order, created = Order.objects.get_or_create(customer=customer, status=Order.STATUS[0][0])
-
-    else:
-        order = {'get_total_order': 0, 'get_total_cart_items': 0}
+    order = data['order']
 
     context['products'] = products
 
@@ -33,42 +31,22 @@ def store(request):
 def cart(request):
     context = {}
 
-    if request.user.is_authenticated:
-        customer = request.user.customer
-        # Status recebe Order.STATUS[0][0] pois no models falei que o campo seria um choice, logo criei
-        # um valor para representar o estado da ordem [0][0] é o primeiro valor da tupla
-        # ('In the cart', 'In the cart')
-        order, created = Order.objects.get_or_create(customer=customer, status=Order.STATUS[0][0])
-        items = order.orderitem_set.all()
+    data = cartData(request)
 
-    else:
-        order = {'get_total_order': 0, 'get_total_cart_items': 0}
-        items = []
-
-    context['order'] = order
-    context['items'] = items
+    context['order'] = data['order']
+    context['items'] = data['items']
+    context['quantity_items'] = data['quantity_items']
     return render(request=request, template_name='store/cart.html', context=context)
 
 
 def checkout(request):
     context = {}
+    data = cartData(request)
+    if data['quantity_items'] == 0:
+        return HttpResponse("You are not authorized to access this page!")
 
-    if request.user.is_authenticated:
-        customer = request.user.customer
-        # Status recebe Order.STATUS[0][0] pois no models falei que o campo seria um choice, logo criei
-        # um valor para representar o estado da ordem [0][0] é o primeiro valor da tupla
-        # ('In the cart', 'In the cart')
-        order, created = Order.objects.get_or_create(customer=customer, status=Order.STATUS[0][0])
-        items = order.orderitem_set.all()
-
-
-
-    else:
-        order = {'get_total_cart_items': 0, 'get_total_order': '0,00'}
-        items = []
-
-    context['order'] = order
-    context['items'] = items
+    context['order'] = data['order']
+    context['items'] = data['items']
     return render(request=request, template_name='store/checkout.html', context=context)
 
 
@@ -98,59 +76,52 @@ def update_item(request):
     return JsonResponse(f'Item was {action}ed', safe=False)
 
 
+def process_whatsapp_order(request):
+    return JsonResponse('Whats Message Ready To Send', safe=False)
+
+
 def process_order(request):
     data = json.loads(request.body)
+    # print(data)
     user_data = data['userData']
     shipping_data = data['shippingData']
 
-    name = ''
-    email = ''
-
-
-    if user_data['name']:
-        name = user_data['name']
-        email = user_data['email']
-    else:
-        name = request.user.customer.name
-        email = request.user.customer.email
-
-
+    # Usuário com cadastro
     if request.user.is_authenticated:
         customer = request.user.customer
         order, created = Order.objects.get_or_create(customer=customer, status=Order.STATUS[0][0])
 
-        transaction_id = f'{name.replace(" ", "")}{datetime.now().timestamp()}'
-        order.transaction_id = transaction_id
-
-
-        order_item = order.orderitem_set.all()
-        total = float(user_data['total'])
-
-        if total == order.get_total_order:
-            order.status = Order.STATUS[2][0]
-            for item in order_item:
-                print(item)
-                product = Product.objects.get(id=item.product.id)
-                product.available_quantity -= item.quantity
-                product.save()
-
-        order.save()
-
-        if order.shipping:
-            ShippingAdress.objects.create(
-                customer=customer,
-                order=order,
-                adress=shipping_data['address'],
-                state=shipping_data['state'],
-                city=shipping_data['city'],
-                country=shipping_data['country'],
-                zipcode=shipping_data['zipcode'],
-                #     date_added é adicoinado automaticamente(auto_now_add=True)
-            )
-
-
-
+    # Usuário Visitante
     else:
-        print('user not logged in')
+        customer, order = guestOrder(request, user_data)
+
+    # Finaliza o processo. Todas as condicionais possuem o mesmo fim
+    transaction_id = f'{customer.name.replace(" ", "")}{datetime.now().timestamp()}'
+    order.transaction_id = transaction_id
+
+    order_item = order.orderitem_set.all()
+    total = float(user_data['total'])
+
+    if total == order.get_total_order:
+        order.status = Order.STATUS[2][0]
+        for item in order_item:
+            # print(item)
+            product = Product.objects.get(id=item.product.id)
+            product.available_quantity -= item.quantity
+            product.save()
+
+    order.save()
+
+    if order.shipping:
+        ShippingAdress.objects.create(
+            customer=customer,
+            order=order,
+            adress=shipping_data['address'],
+            state=shipping_data['state'],
+            city=shipping_data['city'],
+            country=shipping_data['country'],
+            zipcode=shipping_data['zipcode'],
+            #     date_added é adicoinado automaticamente(auto_now_add=True)
+        )
 
     return JsonResponse('Payment Completed', safe=False)

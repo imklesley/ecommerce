@@ -21,7 +21,7 @@
                         <div style="flex: 2"><img class="row-image" src="{{ item.product.image_url }}" alt=""></div>
                         <div style="flex: 2">{{ item.product.name }}</div>
                         <div style="flex: 1">R$ {{ item.product.price }}</div>
-                        <div style="flex: 1"><p class="quantity">{{ item.quantity }}</p></div>
+                        <div style="flex: 1"><p class="quantity">{{ item.quantity }}x</p></div>
                     </div>
                 {% endfor %}
 
@@ -37,8 +37,6 @@
             <div class="box-element" id="form-wrapper">
                 <form id="form">
                     {% csrf_token %}
-
-                    {#                    Caso o usuário não esteja logado, permitir que ele faça o pedido pelo whatsapp#}
                     {% if  not request.user.is_authenticated %}
                         <div id="user-info">
                             <div class="form-field">
@@ -58,25 +56,19 @@
                             </p>
                         {% endfor %}
                         <div id="other-receiver-info" class="hidden">
-                            <h5>Quem vai receber esse produto?</h5>
+                            <h5>Alterar dados pessoais para envio?</h5>
 
                             <div class="form-field">
-                                <input required type="text" name="name" placeholder="Nome ..." class="form-control">
+                                <input required type="text" name="name" placeholder="Nome ..." class="form-control"
+                                       value="{{ request.user.customer.name }}">
                             </div>
 
                             <div class="form-field">
-                                <input required type="email" name="email" placeholder="E-mail ..." class="form-control">
+                                <input required type="email" name="email" placeholder="E-mail ..." class="form-control"
+                                       value="{{ request.user.customer.email }}">
                             </div>
                         </div>
                     {% endif %}
-
-
-
-
-
-
-
-
 
 
                     {% if order.shipping %}
@@ -127,7 +119,7 @@
                 <hr>
                 {#                Para whatsapp#}
                 <a id="make-whatsapp-order"
-                   href="https://api.whatsapp.com/send/?phone=5563999500153&text={{ order.whatsapp_order_text }}"
+                   href="#"
                    class="btn btn-outline-success btn-block" style="float: right; border-radius: 5px" type="button">Fazer
                     Pedido <img style="padding-left: 10px"
                                 src="https://www.flaticon.com/svg/static/icons/svg/2111/2111728.svg" alt="" height="23"></a>
@@ -155,14 +147,18 @@
     <script type="text/javascript">
 
 
-        var otherReceiverInfo = document.getElementById('other-receiver-info');
-        var msgotherReceiverInfo = document.getElementById('msg-add-other-receiver');
-        document.getElementById('add-other-receiver').addEventListener('click', function () {
-            msgotherReceiverInfo.classList.add('hidden');
-            otherReceiverInfo.classList.remove('hidden')
+        if (user != 'AnonymousUser') {
+            var otherReceiverInfo = document.getElementById('other-receiver-info');
+            var msgotherReceiverInfo = document.getElementById('msg-add-other-receiver');
+            document.getElementById('add-other-receiver').addEventListener('click', function (event) {
+                event.preventDefault();
+
+                msgotherReceiverInfo.classList.add('hidden');
+                otherReceiverInfo.classList.remove('hidden')
 
 
-        })
+            })
+        }
 
 
         var form = document.getElementById('form')
@@ -184,15 +180,15 @@
         var editForm = document.getElementById('edit-form')
 
         editForm.addEventListener('click', function (event) {
-            event.preventDefault()
+            event.preventDefault();
 
 
-            document.getElementById('form-button').classList.remove('hidden')
-            document.getElementById('payment-info').classList.add('hidden')
+            document.getElementById('form-button').classList.remove('hidden');
+            document.getElementById('payment-info').classList.add('hidden');
 
 
             //Para não permitir editar os campos depois que avançou para "Opçãoes de Pagamentos"
-            var fields = document.getElementsByClassName('form-control')
+            var fields = document.getElementsByClassName('form-control');
             for (let i = 0; fields.length; i++) {
                 fields[i].disabled = false;
             }
@@ -202,7 +198,7 @@
 
         document.getElementById('make-payment').addEventListener('click', function (event) {
 
-            submitFormData()
+            submitFormData();
 
 
         })
@@ -215,7 +211,6 @@
             var userFormData = {
                 'name': null,
                 'email': null,
-                'otherUser':false,
                 'total': total,
             };
 
@@ -229,30 +224,28 @@
 
             var shipping = '{{ order.shipping }}';
             if (shipping != 'False') {
-                shippingFormData.address = form.adress.value
-                shippingFormData.city = form.city.value
-                shippingFormData.state = form.state.value
-                shippingFormData.zipcode = form.zipcode.value
-                shippingFormData.country = form.country.value
+                shippingFormData.address = form.adress.value;
+                shippingFormData.city = form.city.value;
+                shippingFormData.state = form.state.value;
+                shippingFormData.zipcode = form.zipcode.value;
+                shippingFormData.country = form.country.value;
             }
-
 
 
             if (user == 'AnonymousUser') {
-                userFormData.name = form.name.value
-                userFormData.email = form.email.value
-            }
-            else if(msgotherReceiverInfo.classList.contains('hidden')){
-                userFormData.name = form.name.value
-                userFormData.email = form.email.value
-                userFormData.otherUser = true
+                userFormData.name = form.name.value;
+                userFormData.email = form.email.value;
+            } else if (msgotherReceiverInfo.classList.contains('hidden')) {
+                userFormData.name = form.name.value;
+                userFormData.email = form.email.value;
+                userFormData.otherUser = true;
 
 
             }
 
-            console.log(userFormData)
+            console.log(userFormData);
 
-            console.log(shippingFormData)
+            console.log(shippingFormData);
 
             //Agora fazer o fecht api para enviar dados pro backend
             var url = '/process_order/'
@@ -269,12 +262,93 @@
             }).then(function (data) {
                 console.log(data);
                 alert('Compra realizada com sucesso!');
+                cart = {}
+                document.cookie = 'cart=' + JSON.stringify(cart) + ";domain=;path=/";
+
                 window.location.href = '{% url 'store'%}';
 
             }).catch(function (error) {
                 console.error(error);
             })
         }
+
+        ////////////////// Whatsapp Order /////////////////////////////////
+
+        document.getElementById('make-whatsapp-order').addEventListener('click', function (event) {
+                event.preventDefault();
+                //Pega os dados do usuário
+                var userFormData = {
+                    'name': form.name.value,
+                    'email': form.name.value,
+                };
+
+                var shippingFormData = {
+                    'address': null,
+                    'city': null,
+                    'state': null,
+                    'zipcode': null,
+                    'country': null,
+                };
+
+                var shipping = '{{ order.shipping }}';
+                if (shipping != 'False') {
+                    shippingFormData.address = form.adress.value;
+                    shippingFormData.city = form.city.value;
+                    shippingFormData.state = form.state.value;
+                    shippingFormData.zipcode = form.zipcode.value;
+                    shippingFormData.country = form.country.value;
+                }
+
+
+                if (user == 'AnonymousUser') {
+                    userFormData.name = form.name.value;
+                    userFormData.email = form.email.value;
+                } else if (msgotherReceiverInfo.classList.contains('hidden')) {
+                    userFormData.name = form.name.value;
+                    userFormData.email = form.email.value;
+                    userFormData.otherUser = true;
+
+
+                }
+
+
+                //Faz processo de montagem da mensagem
+                var break_line = '%0A';
+
+                var whatsapp_order_text = 'Olá, gostaria de fazer um pedido: ' + break_line + break_line
+
+                whatsapp_order_text += '-------- Itens do Pedido --------' + break_line
+
+                {% for item in items %}
+                    whatsapp_order_text += '*{{ item.quantity }}x*\t-\t{{ item.product.name }}\t-\t{{ item.product.price }}' + break_line
+                {% endfor %}
+                whatsapp_order_text += break_line;
+                whatsapp_order_text += '-------- Dados do Pedido --------' + break_line
+                {##Mostra os quantitativos#}
+                whatsapp_order_text += '*Quantidade de Itens:* {{ order.get_total_cart_items }}' + break_line
+                whatsapp_order_text += '*Total:* {{ order.get_total_order }}' + break_line
+
+                whatsapp_order_text += '-------- OBSERVAÇÕES --------' + break_line;
+                whatsapp_order_text += 'CRIAR UM CAMPO PARA OBSERVAÇÕES' + break_line;
+                whatsapp_order_text += break_line;
+                whatsapp_order_text += '-------- Dados de Envio --------' + break_line;
+                whatsapp_order_text += 'Nome: ' + userFormData.name + break_line;
+                whatsapp_order_text += 'Email: ' + userFormData.email + break_line;
+                {% if order.shipping %}
+                    whatsapp_order_text += 'País: ' + shippingFormData.country + break_line;
+                    whatsapp_order_text += 'Estado: ' + shippingFormData.state + break_line;
+                    whatsapp_order_text += 'Cidade: ' + shippingFormData.city + break_line;
+                    whatsapp_order_text += 'CEP: ' + shippingFormData.zipcode + break_line + break_line;
+                {% endif %}
+                whatsapp_order_text += '---------------------' + break_line;
+                whatsapp_order_text += 'by Focus Store';
+
+
+                window.location.href = 'https://api.whatsapp.com/send/?phone=5563999500153&text=' + whatsapp_order_text
+
+            }
+        );
+
 
     </script>
 
