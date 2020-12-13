@@ -120,15 +120,18 @@
                 {#                Para whatsapp#}
                 <a id="make-whatsapp-order"
                    href="#"
-                   class="btn btn-outline-success btn-block" style="float: right; border-radius: 5px" type="button">Fazer
+                   class="btn btn-outline-success btn-block" style="border-radius: 5px" type="button">Fazer
                     Pedido <img style="padding-left: 10px"
                                 src="https://www.flaticon.com/svg/static/icons/svg/2111/2111728.svg" alt="" height="23"></a>
+
                 {#                Outro tipo de finalização de pedido#}
-                <button id="make-payment" class="btn btn-outline-dark btn-block"
-                        style="float: right; border-radius: 5px"
-                        type="button">Finalizar
-                    Pedido
-                </button>
+                <!-- Set up a container element for the button -->
+                <div id="paypal-button-container" style="padding-top: 20px"></div>
+                {#                <button id="make-payment" class="btn btn-outline-dark btn-block"#}
+                {#                        style="float: right; border-radius: 5px"#}
+                {#                        type="button">Finalizar#}
+                {#                    Pedido#}
+                {#                </button>#}
                 <br>
                 <br>
                 <br>
@@ -141,6 +144,49 @@
         </div>
 
     </div>
+
+    {#LEMBRE QUE A OPÇÃO PAY WITH DEBIT OR CREDIT CARD SÓ IRÁ APARECER SE O SITE EM PRODUÇÃO POSSUIR certificado ssl#}
+    {# Os botões e a configuração foram encontrados aqui: https://developer.paypal.com/demo/checkout/#/pattern/style#}
+    <!-- Include the PayPal JavaScript SDK -->
+    <script src="https://www.paypal.com/sdk/js?client-id=AbAXjnus3rlmNSUDS_clB4GD6IKijcll67K3d-Tglz6Quk1hsATBWksjIYWmyi87nJkc0i7mUXGn4mK6&currency=BRL"></script>
+
+
+    <script>
+        // Render the PayPal button into #paypal-button-container
+        paypal.Buttons({
+
+            //É possivel customizar os botões, documentação aqui: https://developer.paypal.com/docs/archive/checkout/how-to/customize-button/#supported-locales
+
+            style: {
+                color: 'gold',
+                label: 'pay',
+                shape: 'rect',
+            },
+
+
+            // Set up the transaction
+            createOrder: function (data, actions) {
+                return actions.order.create({
+                    purchase_units: [{
+                        amount: {
+                            value: '{{ order.get_total_order }}'
+                        }
+                    }]
+                });
+            },
+
+            // Finalize the transaction
+            onApprove: function (data, actions) {
+                return actions.order.capture().then(function (details) {
+                    // Show a success message to the buyer
+                    {#alert('Transaction completed by ' + details.payer.name.given_name + '!');#}
+                    submitFormData();
+                });
+            }
+
+
+        }).render('#paypal-button-container');
+    </script>
 
 
 
@@ -192,14 +238,6 @@
             for (let i = 0; fields.length; i++) {
                 fields[i].disabled = false;
             }
-
-        })
-
-
-        document.getElementById('make-payment').addEventListener('click', function (event) {
-
-            submitFormData();
-
 
         })
 
@@ -312,6 +350,8 @@
                 }
 
 
+                var contact = '5563992458980';
+
                 //Faz processo de montagem da mensagem
                 var break_line = '%0A';
 
@@ -339,12 +379,13 @@
                     whatsapp_order_text += 'Estado: ' + shippingFormData.state + break_line;
                     whatsapp_order_text += 'Cidade: ' + shippingFormData.city + break_line;
                     whatsapp_order_text += 'CEP: ' + shippingFormData.zipcode + break_line + break_line;
+                    whatsapp_order_text += 'Endereço: ' + shippingFormData.address + break_line;
                 {% endif %}
                 whatsapp_order_text += '---------------------' + break_line;
                 whatsapp_order_text += 'by Focus Store';
 
 
-                window.location.href = 'https://api.whatsapp.com/send/?phone=5563999500153&text=' + whatsapp_order_text
+                window.location.href = 'https://api.whatsapp.com/send/?phone=' + contact + '&text=' + whatsapp_order_text
 
             }
         );

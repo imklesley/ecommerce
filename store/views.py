@@ -15,6 +15,7 @@ def log_out(request):
 
 def store(request):
     context = {}
+
     data = cartData(request)
 
     products = Product.objects.all()
@@ -80,6 +81,9 @@ def process_whatsapp_order(request):
     return JsonResponse('Whats Message Ready To Send', safe=False)
 
 
+
+
+#    {#LEMBRE QUE A OPÇÃO PAY WITH DEBIT OR CREDIT CARD SÓ IRÁ APARECER SE O SITE EM PRODUÇÃO POSSUIR certificado ssl#}
 def process_order(request):
     data = json.loads(request.body)
     # print(data)
