@@ -11,7 +11,7 @@ def unauthenticated_user(view):
     def wrapper_func(request, *args, **kwargs):
         # Se o usuário está autenticado, ele não precisa vê a página de login e/ou register
         if request.user.is_authenticated:
-            return redirect('home')
+            return redirect('store')
         # Caso contrário permite o acesso à página de login e/ou register
         else:
             return view(request, *args, **kwargs)

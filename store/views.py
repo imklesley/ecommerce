@@ -1,15 +1,11 @@
 from .models import *
 from django.http import JsonResponse
 from .utils import *
-
 import json
 from datetime import datetime
 
 # class-based view
-from django.views.generic import ListView,DetailView
-
-
-
+from django.views.generic import ListView, DetailView, View
 
 
 class StoreView(ListView):
@@ -20,10 +16,10 @@ class StoreView(ListView):
     # É preciso sobrescrever o template
     template_name = 'store/store.html'
 
+    # Para realizar paginação basta fazer isso.COISA MAIS LINDA QUE JÁ Ví kkk
+    paginate_by = 9
 
-    #Para realizar paginação basta fazer isso.COISA MAIS LINDA QUE JÁ Ví kkk
-    paginate_by = 8
-
+    ordering = ['-date_created']
 
     def get_context_data(self, **kwargs):
         context = super(StoreView, self).get_context_data(**kwargs)
@@ -32,8 +28,6 @@ class StoreView(ListView):
         # print(order)
         context['order'] = order
         return context
-
-
 
 
 class ProductDetailsView(DetailView):
@@ -61,7 +55,6 @@ class CartView(ListView):
     # É preciso sobrescrever o template
     template_name = 'store/cart.html'
 
-
     def get_context_data(self, **kwargs):
         context = super(CartView, self).get_context_data(**kwargs)
         data = cartData(self.request)
@@ -71,7 +64,6 @@ class CartView(ListView):
         context['quantity_items'] = data['quantity_items']
         context['items'] = data['items']
         return context
-
 
 
 class CheckoutView(ListView):
@@ -92,79 +84,80 @@ class CheckoutView(ListView):
         context['items'] = data['items']
         return context
 
-def update_item(request):
-    data = json.loads(request.body)
-    product_id = data['productId']
-    action = data['action']
 
-    customer = request.user.customer
-    order, created = Order.objects.get_or_create(customer=customer, status=Order.STATUS[0][0])
-    if action == 'clear_cart':
-        order.delete()
-        return JsonResponse(f'Cart was cleared', safe=False)
+class UpdateItemCartView(View):
 
-    product = Product.objects.get(id=product_id)
-    order_item, created = OrderItem.objects.get_or_create(order=order, product=product)
+    def post(self, request, *args, **kwargs):
+        data = json.loads(request.body)
+        product_id = data['productId']
+        action = data['action']
 
-    if action == 'add':
-        order_item.quantity += 1
-    elif action == 'subtract':
-        order_item.quantity -= 1
-    order_item.save()
+        customer = request.user.customer
+        order, created = Order.objects.get_or_create(customer=customer, status=Order.STATUS[0][0])
+        if action == 'clear_cart':
+            order.delete()
+            return JsonResponse(f'Cart was cleared', safe=False)
 
-    if order_item.quantity <= 0:
-        order_item.delete()
+        product = Product.objects.get(id=product_id)
+        order_item, created = OrderItem.objects.get_or_create(order=order, product=product)
 
-    return JsonResponse(f'Item was {action}ed', safe=False)
+        if action == 'add':
+            order_item.quantity += 1
+        elif action == 'subtract':
+            order_item.quantity -= 1
+        order_item.save()
 
+        if order_item.quantity <= 0:
+            order_item.delete()
 
-def process_whatsapp_order(request):
-    return JsonResponse('Whats Message Ready To Send', safe=False)
+        return JsonResponse(f'Item was {action}ed', safe=False)
 
 
 #    {#LEMBRE QUE A OPÇÃO PAY WITH DEBIT OR CREDIT CARD SÓ IRÁ APARECER SE O SITE EM PRODUÇÃO POSSUIR certificado ssl#}
-def process_order(request):
-    data = json.loads(request.body)
-    # print(data)
-    user_data = data['userData']
-    shipping_data = data['shippingData']
+class ProcessOrderView(View):
 
-    # Usuário com cadastro
-    if request.user.is_authenticated:
-        customer = request.user.customer
-        order, created = Order.objects.get_or_create(customer=customer, status=Order.STATUS[0][0])
+    def post(self, request, *args, **kwargs):
+        data = json.loads(request.body)
+        # print(data)
+        user_data = data['userData']
+        shipping_data = data['shippingData']
 
-    # Usuário Visitante
-    else:
-        customer, order = guestOrder(request, user_data)
+        # Usuário com cadastro
+        if request.user.is_authenticated:
+            customer = request.user.customer
+            order, created = Order.objects.get_or_create(customer=customer, status=Order.STATUS[0][0])
 
-    # Finaliza o processo. Todas as condicionais possuem o mesmo fim
-    transaction_id = f'{customer.name.replace(" ", "")}{datetime.now().timestamp()}'
-    order.transaction_id = transaction_id
+        # Usuário Visitante
+        else:
+            customer, order = guestOrder(request, user_data)
 
-    order_item = order.orderitem_set.all()
-    total = float(user_data['total'])
+        # Finaliza o processo. Todas as condicionais possuem o mesmo fim
+        transaction_id = f'{customer.name.replace(" ", "")}{datetime.now().timestamp()}'
+        order.transaction_id = transaction_id
 
-    if total == order.get_total_order:
-        order.status = Order.STATUS[2][0]
-        for item in order_item:
-            # print(item)
-            product = Product.objects.get(id=item.product.id)
-            product.available_quantity -= item.quantity
-            product.save()
+        order_item = order.orderitem_set.all()
+        total = float(user_data['total'])
 
-    order.save()
+        if total == order.get_total_order:
+            order.status = Order.STATUS[2][0]
+            for item in order_item:
+                # print(item)
+                product = Product.objects.get(id=item.product.id)
+                product.available_quantity -= item.quantity
+                product.save()
 
-    if order.shipping:
-        ShippingAdress.objects.create(
-            customer=customer,
-            order=order,
-            adress=shipping_data['address'],
-            state=shipping_data['state'],
-            city=shipping_data['city'],
-            country=shipping_data['country'],
-            zipcode=shipping_data['zipcode'],
-            #     date_added é adicoinado automaticamente(auto_now_add=True)
-        )
+        order.save()
 
-    return JsonResponse('Payment Completed', safe=False)
+        if order.shipping:
+            ShippingAdress.objects.create(
+                customer=customer,
+                order=order,
+                adress=shipping_data['address'],
+                state=shipping_data['state'],
+                city=shipping_data['city'],
+                country=shipping_data['country'],
+                zipcode=shipping_data['zipcode'],
+                #     date_added é adicoinado automaticamente(auto_now_add=True)
+            )
+
+        return JsonResponse('Payment Completed', safe=False)

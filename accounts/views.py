@@ -1,25 +1,25 @@
 from django.shortcuts import render
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
-# Verifica se o usuário logou, caso não tenha logado redireciona para a página de login
-from django.contrib.auth.decorators import login_required
-
-##
 from .forms import *
 from .decorators import *
 
 from store.utils import cartData
 from store.models import Customer
-from django.contrib.auth.models import User
+from django.views.generic import View
+
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 
+class RegisterView(View):
+    form_class = RegisterForm
 
-@unauthenticated_user
-def register_page(request):
-    context = {}
-    form = RegisterForm()
-    if request.method == 'POST':
-        form = RegisterForm(request.POST)
+    def get(self, request, *args, **kwargs):
+        form = self.form_class
+        return render(self.request, 'accounts/register_page.html', {'form': form})
+
+    def post(self, request, *args, **kwargs):
+        form = self.form_class(request.POST)
         if form.is_valid():
             # Ao salvar o formulário, salvo o user criado
             user = form.save()
@@ -31,23 +31,17 @@ def register_page(request):
                 email=user.email,
             )
             customer.save()
-
-
-
-
-
             # Envia a mensagem de sucesso para a próxima page
-            messages.success(request, message=f'{username} created with success !')
+            messages.success(request, message=f'{username} sua conta foi criada com sucesso!')
             return redirect('login_page')
 
-    context['form'] = form
-    return render(request, 'accounts/register_page.html', context)
-
-
-@unauthenticated_user
-def login_page(request):
+class LoginView(View):
     context = {}
-    if request.method == 'POST':
+
+    def get(self, request, *args, **kwargs):
+        return render(request, 'accounts/login_page.html', self.context)
+
+    def post(self, request, *args, **kwargs):
         username = request.POST['username']
         password = request.POST['password']
 
@@ -56,56 +50,58 @@ def login_page(request):
             login(request, user)
             return redirect('store')
         else:
-            messages.error(request=request, message='Your username or password is invalid!')
+            messages.error(request=request, message='Seu username ou senha são inválidos')
 
-    return render(request, 'accounts/login_page.html', context)
+        return render(request, 'accounts/login_page.html', self.context)
 
-
-
-
-@login_required(login_url='login_page')
-def user_orders(request):
+# class UserOrders(LoginRequiredMixin, View):
+class UserOrders(View):
+    login_url = 'login_page'
     context = {}
-    orders = request.user.customer.order_set.all()
-    total_orders = orders.count()
-    waiting_payment = orders.filter(status='Waiting for Payment').count()
-    preparation = orders.filter(status='Preparation').count()
-    delivered = orders.filter(status='Delivered').count()
 
-    data = cartData(request)
+    def get(self, request, *args, **kwargs):
+        orders = request.user.customer.order_set.all()
+        total_orders = orders.count()
+        waiting_payment = orders.filter(status='Waiting for Payment').count()
+        preparation = orders.filter(status='Preparation').count()
+        delivered = orders.filter(status='Delivered').count()
 
-    context['order'] = {'get_total_cart_items':data['order'].get_total_cart_items}
-    context['orders'] = orders
-    context['total_orders'] = total_orders
-    context['waiting_payment'] = waiting_payment
-    context['preparation'] = preparation
-    context['delivered'] = delivered
+        data = cartData(request)
 
-    return render(request, 'accounts/my_orders.html', context)
+        self.context['order'] = {'get_total_cart_items': data['order'].get_total_cart_items}
+        self.context['orders'] = orders
+        self.context['total_orders'] = total_orders
+        self.context['waiting_payment'] = waiting_payment
+        self.context['preparation'] = preparation
+        self.context['delivered'] = delivered
 
+        return render(request, 'accounts/my_orders.html', self.context)
 
-@login_required(login_url='login_page')
-def account_settings(request):
+class AccountSettingsView(View):
     context = {}
-    customer = request.user.customer
-    form = AccountSettingsForm(instance=customer)
+    login_url = 'login'
 
-    if request.method == 'POST':
-        form = AccountSettingsForm(request.POST, request.FILES, instance=customer)
+    def get(self, request, *args, **kwargs):
+        customer = request.user.customer
+        form = AccountSettingsForm(instance=customer)
+        data = cartData(request)
+
+        self.context['order'] = {'get_total_cart_items': data['order'].get_total_cart_items}
+        self.context['form'] = form
+
+        return render(request=request, template_name='accounts/account_settings.html', context=self.context)
+
+    def post(self, request, *args, **kwargs):
+        form = AccountSettingsForm(request.POST, request.FILES, instance=self.request.user.customer)
         if form.is_valid():
             form.save()
             messages.success(request, message=f'{request.user.customer.name} Seu Perfíl Foi Atualizado!')
             return redirect('account_settings')
 
 
-    data = cartData(request)
+class LogoutView(View):
+    login_url = 'login_page'
 
-    context['order'] = {'get_total_cart_items': data['order'].get_total_cart_items}
-    context['form'] = form
-
-    return render(request=request, template_name='accounts/account_settings.html', context=context)
-
-
-def log_out(request):
-    logout(request)
-    return redirect('store')
+    def get(self,request,*args,**kwargs):
+        logout(request)
+        return redirect('store')

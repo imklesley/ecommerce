@@ -17,7 +17,7 @@
             <div class="card card-body">
                 <a class="btn btn-warning" href="{% url 'store' %}"> &#8592; Voltar Para Loja</a>
                 <hr>
-                <h3 style="text-align: center">Account Settings</h3>
+                <h3 style="text-align: center">Configurações</h3>
                 <hr>
                 {% if  request.user.customer.profile_img %}
                     <img class="profile-pic" src="{{ request.user.customer.profile_img.url }}">

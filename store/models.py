@@ -22,6 +22,7 @@ class Product(models.Model):
     price = models.DecimalField(max_digits=8, decimal_places=2)
     digital = models.BooleanField(default=False, null=False)
     available_quantity = models.IntegerField(default=0, null=False, blank=False)
+    date_created = models.DateTimeField(null=True, auto_now_add=True)
 
     def __str__(self):
         return self.name
@@ -83,24 +84,25 @@ class Order(models.Model):
 
     @property
     def whatsapp_order_text(self):
-        #Código para pular linha
+        # Código para pular linha
         break_line = '%0A'
-        #pego todos os itens dentro do pedido
+        # pego todos os itens dentro do pedido
         items = self.orderitem_set.all()
-        #Inicializo o texto a ser enviado pro cliente e adiciono duas vezes o break_line
+        # Inicializo o texto a ser enviado pro cliente e adiciono duas vezes o break_line
         text = f'Olá, gostaria de fazer um pedido: {break_line}{break_line}'
-        #Pra cada item da ordem especificar os detalhes e pular uma linha
+        # Pra cada item da ordem especificar os detalhes e pular uma linha
         for item in items:
             text += f'*{item.quantity}x*\t-\t{item.product.name}\t-\t{item.product.price}{break_line}'
 
         text += break_line
         text += '-----------------------------' + break_line
 
-        #Mostra os quantitativos
+        # Mostra os quantitativos
         text += f'*Quantidade de Itens:* {self.get_total_cart_items}{break_line}'
         text += f'*Total:* {self.get_total_order}{break_line}'
 
         return text
+
 
 class OrderItem(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, null=True)

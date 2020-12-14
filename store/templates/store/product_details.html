@@ -171,7 +171,7 @@ img {
     </style>
 
     <div class="container">
-        <a class="btn btn-outline-dark" style="border-radius: 6px" href="{% url 'store' %}">&#8592 Voltar</a>
+        <a class="btn btn-outline-dark" style="border-radius: 6px" href="javascript: history.go(-1)">&#8592 Voltar</a>
 		<div class="card">
 			<div class="container-fliud">
 				<div class="wrapper row">
@@ -199,9 +199,9 @@ img {
 						<h4 class="price">Preço: <span>R$ {{ product.price }}</span></h4>
 						<p class="vote"><strong>73%</strong> dos usuários gostaram desse produto! <strong>(87 <votos></votos>)</strong></p>
 						<div class="action">
-							<button class="add-to-cart btn btn-default  add-btn update-cart" data-product="{{ product.id }}"
-                            data-action="add"type="button">add to cart</button>
-							<button class="like btn btn-default" type="button"><span class="fa fa-heart">Gostei &#9825;</span></button>
+							<button class="add-to-cart btn btn-default btn-block add-btn update-cart" data-product="{{ product.id }}"
+                            data-action="add"type="button">Adicionar ao Carrinho</button>
+							<button class="like btn btn-default btn-block" type="button"><span class="fa fa-heart">Gostei &#9825;</span></button>
 						</div>
 					</div>
 				</div>

@@ -133,3 +133,15 @@ MEDIA_ROOT = path.join(BASE_DIR, 'media_cdn')
 
 
 
+#Configuração de emails
+if DEBUG:
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # Somente durante o desenvolvimento
+else:
+    # Configuração de envio de mensagens por email
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+    EMAIL_HOST = 'smtp.gmail.com'
+    EMAIL_PORT = 587
+    EMAIL_USE_TLS = True
+    EMAIL_HOST_USER = 'imklesley@gmail.com'
+    # Não deixa essa senha visível não vacilão
+    EMAIL_HOST_PASSWORD = 'rsuosrzgydcqotqw'

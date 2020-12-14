@@ -2,37 +2,48 @@
 {% load static %}
 
 {% block title %}
-    Coisa de Deusa
+    Focus Store
 {% endblock %}
 
 {% block content %}
+
+    <a href="{% url 'cart' %}">
+
+        <div style="position:fixed;width:60px;height:60px;bottom:40px;right:40px;background-color:#04293C;color:#FFF;border-radius:50px;text-align:center;font-size:30px;box-shadow: 1px 1px 2px #888;
+  z-index:1100;" target="_blank">
+            <img style="height: 30px" src="{% static 'images/cart.png' %}" alt="">
+            <p id="cart-total">{{ order.get_total_cart_items }}</p>
+        </div>
+    </a>
+
     {#Adicionei linhas que irão conter 3 colunas cada elemento irá representar um produto#}
     <div class="row" style="    padding: 2em 0 ; ">
 
         {% for product in products %}
-            <a style="text-decoration: none" href="{% url 'product_details' product.id %}">
 
             <div class="col-lg-4" style="height: 100%; width: 100%">
-                <img class="thumbnail" src=" {{ product.image_url }}" alt="{{ product.name }}">
-                <div class="box-element product">
-                    <h6><strong>{{ product.name }}</strong></h6>
-                    <h4 style="display: inline-block; float: bottom ;font-size: 1.1rem">
-                        <strong>R$ {{ product.price }}</strong></h4>
+                <a style="text-decoration: none" href="{% url 'product_details' product.id %}">
 
-                    <hr>
-                    <button class="btn btn-outline-warning add-btn update-cart" data-product="{{ product.id }}"
-                            data-action="add" style="border-radius: 5px;margin:0 0.3em ">
-                        <b>Comprar</b></button>
-                    <a class="btn btn-outline-success" style="border-radius: 5px" href="{% url 'product_details' product.id %}">Vizualizar</a>
-                </div>
-                <br>
+                    <img class="thumbnail" src=" {{ product.image_url }}" alt="{{ product.name }}">
+                    <div class="box-element product">
+                        <h6><strong>{{ product.name }}</strong></h6>
+                        <h4 style="display: inline-block; float: bottom ;font-size: 1.1rem">
+                            <strong>R$ {{ product.price }}</strong></h4>
+
+                        <hr>
+                        <button class="btn btn-outline-warning add-btn update-cart btn-block"
+                                data-product="{{ product.id }}"
+                                data-action="add" style="border-radius: 5px;">
+                            <b>Comprar</b></button>
+                </a>
             </div>
-            </a>
+            <br>
+            </div>
         {% endfor %}
 
     </div>
 
-    {% if page_obj.has_other_pages%}
+    {% if page_obj.has_other_pages %}
         {% include 'store/snippet/pagination.html' %}
     {% endif %}
 
