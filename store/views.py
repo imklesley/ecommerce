@@ -1,7 +1,5 @@
-from django.shortcuts import render, redirect, get_object_or_404
 from .models import *
-from django.http import HttpResponse, JsonResponse
-from django.contrib.auth import logout
+from django.http import JsonResponse
 from .utils import *
 
 import json
@@ -11,9 +9,7 @@ from datetime import datetime
 from django.views.generic import ListView,DetailView
 
 
-def log_out(request):
-    logout(request)
-    return redirect('store')
+
 
 
 class StoreView(ListView):
@@ -49,23 +45,12 @@ class ProductDetailsView(DetailView):
     def get_queryset(self):
         return self.queryset.filter(pk=self.kwargs.get('pk'))
 
-
-
-
-
-
-
     def get_context_data(self, **kwargs):
         context = super(ProductDetailsView, self).get_context_data(**kwargs)
         data = cartData(self.request)
         order = data['order']
         context['order'] = order
         return context
-
-
-
-
-
 
 
 class CartView(ListView):
@@ -106,46 +91,6 @@ class CheckoutView(ListView):
         context['quantity_items'] = data['quantity_items']
         context['items'] = data['items']
         return context
-
-#
-# def store(request):
-#     context = {}
-#
-#     data = cartData(request)
-#
-#     products = Product.objects.all()
-#
-#     order = data['order']
-#
-#     context['products'] = products
-#
-#     context['order'] = order
-#
-#     return render(request=request, template_name='store/store.html', context=context)
-#
-#
-# def cart(request):
-#     context = {}
-#
-#     data = cartData(request)
-#
-#     context['order'] = data['order']
-#     context['items'] = data['items']
-#     context['quantity_items'] = data['quantity_items']
-#     return render(request=request, template_name='store/cart.html', context=context)
-#
-#
-# def checkout(request):
-#     context = {}
-#     data = cartData(request)
-#     if data['quantity_items'] == 0:
-#         return HttpResponse("You are not authorized to access this page!")
-#
-#     context['order'] = data['order']
-#     context['items'] = data['items']
-#     return render(request=request, template_name='store/checkout.html', context=context)
-
-
 
 def update_item(request):
     data = json.loads(request.body)

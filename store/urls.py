@@ -10,6 +10,5 @@ urlpatterns = [
     path('checkout/', CheckoutView.as_view(), name='checkout'),
     path('update_item/', update_item, name='update_item'),
     path('process_order/', process_order, name='process_order'),
-    path('logout/', log_out, name='logout'),
 
 ]
