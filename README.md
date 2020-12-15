@@ -1,1 +1,2 @@
-# ecommerce
+#Focus Store
+Foi desenvolvido um e-commerce que recebeu o nome de "Focus Store". Essa aplicação permite com que o usuário consumidor, crie uma conta, faça login, realize todas as operações de recuperação de senha, visualize e edite seu perfil, visualise seus pedidos(caso esteja autenticado), visualize algum produto com mais detalhes, coloque e remova produtos do carrinho, e permite finalizar o pedido utilizando o whatsapp(Enviando uma mensagem com o conteúdo do pedido para o número da loja), ou com conta do paypal ou cartão de crédito e débito. Vale ressaltar que um usuário consumidor pode também realizar pedidos sem está autenticado no sistema e que os produtos adicionados por ele ao carrinho serão mantidos até que os cookies do navegador sejam apagados.

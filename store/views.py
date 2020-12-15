@@ -87,6 +87,8 @@ class CheckoutView(ListView):
 
 class UpdateItemCartView(View):
 
+
+
     def post(self, request, *args, **kwargs):
         data = json.loads(request.body)
         product_id = data['productId']
