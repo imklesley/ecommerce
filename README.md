@@ -1,3 +1,36 @@
-#Focus Store
+# Focus Store
 
-Foi desenvolvido um e-commerce que recebeu o nome de "Focus Store". Essa aplicação permite com que o usuário consumidor, crie uma conta, faça login, realize todas as operações de recuperação de senha, visualize e edite seu perfil, visualise seus pedidos(caso esteja autenticado), visualize algum produto com mais detalhes, coloque e remova produtos do carrinho, e permite finalizar o pedido utilizando o whatsapp(Enviando uma mensagem com o conteúdo do pedido para o número da loja), ou com conta do paypal ou cartão de crédito e débito. Vale ressaltar que um usuário consumidor pode também realizar pedidos sem está autenticado no sistema e que os produtos adicionados por ele ao carrinho serão mantidos até que os cookies do navegador sejam apagados.
+Welcome to Focus Store, an e-commerce website that allows you to find the products you need with ease. Our website provides the ability to create an account, log in, perform all password recovery operations, view and edit your profile, view your orders (if you're authenticated), view a product in more detail, place and remove cart products, and finalize the order using Whatsapp, Paypal, or credit and debit cards.
+
+**Features**
+- Create an account and log in
+- Password recovery operations
+- View and edit your profile
+- View your orders (if authenticated)
+- View a product in more detail
+- Place and remove cart products
+- Finalize the order using Whatsapp, Paypal, or credit and debit cards
+- Place orders without being authenticated
+    - Products added to cart are kept until the browser cookies are deleted
+- Others
+
+
+**Images**
+
+Some images can be founded [here](".\github\assets").
+
+
+**Requirements**
+- Django version 3.1.4
+
+**Installation**
+1. Fork the repository
+2. Clone the repository
+3. Install all the dependencies using `pip install -r requirements.txt`
+4. Run the server using `python manage.py runserver`
+
+
+
+##
+
+<p align="center">Developed by <span color="#007DFF" >Klesley Gonçalves</span></p>
