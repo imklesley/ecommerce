@@ -2,7 +2,7 @@
 
 Welcome to Focus Store, an e-commerce website that allows you to find the products you need with ease. Our website provides the ability to create an account, log in, perform all password recovery operations, view and edit your profile, view your orders (if you're authenticated), view a product in more detail, place and remove cart products, and finalize the order using Whatsapp, Paypal, or credit and debit cards.
 
-**Features**
+## Features
 - Create an account and log in
 - Password recovery operations
 - View and edit your profile
@@ -15,15 +15,15 @@ Welcome to Focus Store, an e-commerce website that allows you to find the produc
 - Others
 
 
-**Images**
+## Images
 
 Some images can be found [here](".\github\assets").
 
 
-**Requirements**
+## Requirements
 - Django version 3.1.4
 
-**Installation**
+## Installation
 1. Fork the repository
 2. Clone the repository
 3. Install all the dependencies using `pip install -r requirements.txt`
