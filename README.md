@@ -17,7 +17,7 @@ Welcome to Focus Store, an e-commerce website that allows you to find the produc
 
 ## Images
 
-Some images can be found [here]("./github/assets").
+Some images can be found [here](./github/assets).
 
 
 ## Requirements
