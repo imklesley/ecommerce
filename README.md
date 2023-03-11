@@ -2,6 +2,15 @@
 
 Welcome to Focus Store, an e-commerce website that allows you to find the products you need with ease. Our website provides the ability to create an account, log in, perform all password recovery operations, view and edit your profile, view your orders (if you're authenticated), view a product in more detail, place and remove cart products, and finalize the order using Whatsapp, Paypal, or credit and debit cards.
 
+## Images
+
+
+<div align="center">
+  <img src="./github/assets/1.png" height="700px">
+</div>
+
+Some images can be found [here](./github/assets).
+
 ## Features
 - Create an account and log in
 - Password recovery operations
@@ -13,18 +22,6 @@ Welcome to Focus Store, an e-commerce website that allows you to find the produc
 - Place orders without being authenticated
     - Products added to cart are kept until the browser cookies are deleted
 - Others
-
-
-## Images
-
-
-<div align="center">
-  <img src="./github/assets/1.png" height="700px">
-</div>
-
-
-
-Some images can be found [here](./github/assets).
 
 
 ## Requirements
