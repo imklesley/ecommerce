@@ -17,6 +17,13 @@ Welcome to Focus Store, an e-commerce website that allows you to find the produc
 
 ## Images
 
+
+<div align="center">
+  <img src="./github/assets/1.png" height="700px">
+</div>
+
+
+
 Some images can be found [here](./github/assets).
 
 
